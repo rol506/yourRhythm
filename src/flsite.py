@@ -214,13 +214,20 @@ def profile():
         logout_user()
         return redirect("/login")
 
-    return render_template("profile.html", user=usr)
+    form = AddTaskForm()
+    aiForm = AddTaskAIForm()
+
+    return render_template("profile.html", user=usr, form=form, aiForm=aiForm)
 
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect("/login")
+
+@app.route("/healthcheck")
+def healthcheck():
+    return "", 200
 
 @loginManager.unauthorized_handler
 def unauthorized():

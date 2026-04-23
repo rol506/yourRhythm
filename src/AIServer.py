@@ -13,7 +13,7 @@ locale.setlocale(locale.LC_ALL, "ru_RU.utf-8")
 
 app = Flask("ai-server")
 app.config["AI_PORT"] = int(os.environ.get("AI_PORT", "4222"))
-llm = Llama.from_pretrained(repo_id="bartowski/Meta-Llama-3.1-8B-Instruct-GGUF", filename="Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf")
+llm = Llama(model_path="models/kokos.gguf")
 
 @app.route("/process/<query>")
 def processRequest(query):
@@ -52,6 +52,11 @@ def processRequest(query):
     print("decoded " + str(len(res)))
     print("RESULT: ",res)
     return jsonify(res)
+
+@app.route("/healthcheck")
+@app.route("/")
+def healthcheck():
+    return "", 200
 
 if __name__ == "__main__":
     app.run("0.0.0.0", app.config.get("AI_PORT", 4222), debug=True)

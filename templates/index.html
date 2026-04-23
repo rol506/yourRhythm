@@ -94,7 +94,8 @@
     <div class="container">
       <aside>
         <div class="buttons">
-          <div class="inline"><p>{{user.name}}</p><img src="{{url_for('static', filename='images/blank-avatar.png')}}" width="30px" height="30px"></div> 
+          <div class="inline"><a class="anim-title" href="/profile">{{user.name}}</a>
+            <img src="{{url_for('static', filename='images/blank-avatar.png')}}" width="30px" height="30px"></div>
           <br>
           <a href="#" id="addTask"><div class="inline">
             <p>Добавить задание</p><img src="{{url_for('static', filename='images/plus.png')}}" width="30px" height="30px"></div>

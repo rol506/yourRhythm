@@ -60,8 +60,18 @@ div.inline {
   padding: 0 5px 0 15px;
   transition: background 0.2s ease-out;
 
-  > p, div.spin {
+  > div.spin {
     margin: 7.5px;
+
+  }
+
+  > a {
+    margin: 5px;
+
+    > img {
+      vertical-align: middle;
+    }
+    
   }
 
   > img {
@@ -72,9 +82,9 @@ div.inline {
 div.spin {
   height: 100px;
   aspect-ratio: 1;
-  border: 3px solid black;
+  border: 3px solid white;
   border-radius: 50%;
-  border-color: black transparent black transparent;
+  border-color: white transparent white transparent;
   animation: spin 1.3s linear infinite;
 }
 
@@ -386,6 +396,35 @@ a.anim:after {
 }
 
 a.anim:hover:after {
+  transform: scaleX(1);
+}
+
+a.anim-title {
+  position: relative;
+  text-decoration: none;
+  color: white;
+  transition: 0.2s ease all;
+}
+
+a.anim-title:hover {
+  color: white;
+}
+
+a.anim-title:after {
+  content: "";
+  border-radius: 8px;
+  position: absolute;
+  display: block;
+  height: 2px;
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  transition: 0.2s ease-out all;
+  transform: scaleX(0);
+  background: white;
+}
+
+a.anim-title:hover:after {
   transform: scaleX(1);
 }
 

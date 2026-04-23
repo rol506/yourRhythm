@@ -3,6 +3,7 @@ include/
 lib/
 lib64
 src/__pycache__/
+models/
 pyvenv.cfg
 .env
 core.*
