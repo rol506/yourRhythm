@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en" style="height: 100vh;">
+  <head>
+    {% block head %}
+      {{super()}}
+    {% endblock %}
+  </head>
+  <body style="height: 100%;">
+    {% block body %}
+    <div class="container" style="height:100%;">
+      <nav><span></span><span>ТВОЙ РИТМ</span></nav>
+      <div class="form-wrapper" style="height: 100%;">
+        <div class="form">
+          <span>Регистрация</span>
+          {{super()}}
+          <form action="" method="post" class="login">
+            {{form.hidden_tag()}}
+            {{form.name.label()}}{{form.name()}}
+            {{form.email.label()}}{{form.email()}}
+            {{form.pwd.label()}}{{form.pwd()}}
+            {{form.pwdRepeat.label()}}{{form.pwdRepeat()}}
+            <!--<div class="checkbox-wrapper">{{form.remember.label()}}{{form.remember()}}</div><br>-->
+            <div class="button-wrapper">{{form.submit()}}</div> 
+          </form>
+          <div class="link-wrapper"><a class="anim" href="/login" style="text-align: right;">Войти в аккаунт</a></div>
+        </div>
+      </div>
+    
+    </div>
+    {% endblock %}
+  </body>
+</html>

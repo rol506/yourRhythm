@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% block head %}
+      {{super()}}
+    {% endblock %}
+  </head>
+  <body>
+    {% block body %}
+    {{super()}}
+    <div class="addTask" id="panel" style="display: none;">
+      <div class="formArea">
+      <p>Добавить задачу</p>
+        <div class="tabs">
+          <button onclick="openTab(event, 'manual')" id="manual">Вручную</button>
+          <div class="sep"></div>
+          <button onclick="openTab(event, 'aiAssist')" id="aiAssist">AI-помощник (beta)</button>
+        </div>
+        <div class="tabContents">
+          <div class="tabcontent" id="manual-panel">
+            <form action="/" method="post" class="addTask">
+              {{form.hidden_tag()}}
+              {{form.task.label()}}
+              {{form.task()}}
+              <div class="inline-grid">
+                <div class="column">
+                {{form.priority.label()}}
+                  <ul id="priority" style="list-style:none;padding: 5px;margin:2px;">
+                    <li>
+                      <label>
+                        <input type="radio" id="priority-0" name="priority" value="0">
+                        <span>Низкий</span>
+                      </label>
+                    </li>
+                    <li>
+                      <label>
+                        <input type="radio" id="priority-1" name="priority" value="1">
+                        <span>Средний</span>
+                      </label>
+                    </li>
+                    <li>
+                      <label>
+                        <input type="radio" id="priority-2" name="priority" value="2">
+                        <span>Высокий</span>
+                      </label>
+                    </li>
+                  </ul>
+                <!--{{form.priority()}}-->
+                </div>
+                <div class="column" style="justify-self: right;text-align:right;">
+                  {{form.deadlineDate.label()}}<br>
+                  {{form.deadlineDate()}}
+                  {{form.deadlineTime()}}
+                </div>
+              </div><br><br>
+              <div class="button-wrapper">{{form.submit()}}</div>
+            </form>
+          </div>
+          <div class="tabcontent" id="aiAssist-panel">
+            <form action="/addAI" method="post" class="addTask">
+              {{aiForm.hidden_tag()}}
+              {{aiForm.task.label()}}<br>
+              <p style="color: #959393;margin:0;padding-bottom: 10px;">(с указанием о дедлайне):</p>
+              {{aiForm.task()}}
+              {{aiForm.priority.label()}}
+                  <ul id="priority" style="list-style:none;padding: 5px;margin:2px;">
+                    <li>
+                      <label>
+                        <input type="radio" id="priority-0" name="priority" value="0">
+                        <span>Низкий</span>
+                      </label>
+                    </li>
+                    <li>
+                      <label>
+                        <input type="radio" id="priority-1" name="priority" value="1">
+                        <span>Средний</span>
+                      </label>
+                    </li>
+                    <li>
+                      <label>
+                        <input type="radio" id="priority-2" name="priority" value="2">
+                        <span>Высокий</span>
+                      </label>
+                    </li>
+                  </ul>
+              <div class="button-wrapper">{{aiForm.submit()}}</div>
+            </form>
+          </div>
+        </div>
+        <button id="close">×</button>
+      </div>
+    </div>
+    <div class="container">
+      <aside>
+        <div class="buttons">
+          <div class="inline"><p>{{user.name}}</p><img src="{{url_for('static', filename='images/blank-avatar.png')}}" width="30px" height="30px"></div> 
+          <br>
+          <a href="#" id="addTask"><div class="inline">
+            <p>Добавить задание</p><img src="{{url_for('static', filename='images/plus.png')}}" width="30px" height="30px"></div>
+          </a>
+          <a href="#"><div class="inline"><p>Классы и дети</p>
+          <img id="children" src="{{url_for('static', filename='images/class.png')}}" alt="" width="30px" height="30px"></div></a> 
+          <a href="#" id="logout"><div class="inline"><p>Выйти</p>
+          <img src="{{url_for('static', filename='images/exit.png')}}" width="30px" height="30px">
+          </div></a>
+          <a href="#" id="loader" style="pointer-events: none"><div class="inline"><p>Загружаем календарь...</p>
+            <div class="spin" style="width: 20px; height: 20px"></div></div>
+          </a>
+        </div>
+      </aside>
+      <div class="wrapper">
+      <nav><span style="font-size: 1.3rem;margin-top:4px;">{{user.name}}</span><span>ТВОЙ РИТМ</span></nav>
+      <main>
+        <div class="tableHeader">
+        <button id="prevMonth">&lt;</button>
+        <span id="calLabel">Загрузка...</span>
+        <button id="nextMonth">&gt;</button>
+        </div>
+        <div id="calendar">
+        </div>
+      </main>
+      </div>
+    </div>
+    <script src="{{url_for('static', filename='js/calendar.js')}}"></script>
+    <script src="{{url_for('static', filename='js/addTask.js')}}" defer></script>
+    {% endblock %}
+  </body>
+</html>

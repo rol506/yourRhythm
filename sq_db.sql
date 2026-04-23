@@ -1,0 +1,27 @@
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  pwd TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS teacherStudents (
+  className TEXT NOT NULL,
+  studentID INTEGER REFERENCES users(id),
+  teacherID INTEGER REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS parentStudents (
+  studentID INTEGER REFERENCES users(id),
+  parentID INTEGER REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS tasks (
+  id INTEGER PRIMARY KEY  AUTOINCREMENT,
+  task TEXT NOT NULL,
+  priority INTEGER NOT NULL,
+  deadline DATETIME,
+  isDone INT NOT NULL,
+  ownerID INTEGER REFERENCES users(id),
+  createdByID INTEGER REFERENCES users(id)
+)

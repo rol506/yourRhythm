@@ -1,0 +1,636 @@
+* {
+  font-family: "Sansation", sans-serif;
+}
+
+html, body{
+  width: 100%;
+  margin: 0;
+}
+
+html {
+  height: 100vh;
+}
+
+body {
+  height: calc(100vh - 57px - 30px);
+}
+
+div.container, div.wrapper, main, div#calendar {
+  height: 100%;
+}
+
+aside {
+  position: absolute;
+  top: 0;
+  left: -250px;
+  width: 300px;
+  height: calc(100vh - 10px);
+  transition: all 0.2s ease-out;
+  background-color: #211e1e;
+  padding: 10px 0 0 0;
+  z-index: 999;
+  color: white;
+
+  > div.buttons > a {
+
+    text-decoration: none;
+    color: white;
+
+    &:hover div.inline {
+      background-color: #605e5e;
+    }
+  }
+}
+
+div.inline-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+
+div.column {
+  margin-top: 10px;
+}
+
+div.inline {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px 0 15px;
+  transition: background 0.2s ease-out;
+
+  > p, div.spin {
+    margin: 7.5px;
+  }
+
+  > img {
+    margin-right: 5px;
+  }
+}
+
+div.spin {
+  height: 100px;
+  aspect-ratio: 1;
+  border: 3px solid black;
+  border-radius: 50%;
+  border-color: black transparent black transparent;
+  animation: spin 1.3s linear infinite;
+}
+
+@keyframes spin {
+ to {
+  transform: rotate(360deg);
+}
+
+from {
+  transform: rotate(0deg);
+}
+}
+
+aside:hover {
+  left: 0;
+}
+
+div.wrapper {
+  margin-left: 50px;
+}
+
+nav {
+  border-bottom: 2px #211e1e solid;
+  background: #211e1e;
+  color: white;
+  font-weight: bolder;
+  padding: 5px;
+  font-size: 1.7rem;
+  display: flex;
+  justify-content: space-between;
+  padding-right: 20px;
+}
+
+main {
+  padding: 80px;
+  padding-top: 15px;
+  height: calc(100% - 100px);
+}
+
+div.form-wrapper {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+div.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: #f5f3f4;
+  width: min(60%, 500px);
+  padding: 10px;
+  gap: 10px;
+
+  > span {
+    font-size: 2rem;
+  }
+
+  > div.link-wrapper {
+    width: 70%;
+    text-align: right;
+  }
+
+  > form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+    gap: 5px;
+    width: 90%;
+    background: white;
+    padding: 10px;
+
+    > label {
+      font-size: 0.8rem;
+    }
+
+    > * {
+      width: 98%;
+    }
+
+    > input {
+      height: 30px;
+      font-size: 1rem;
+      padding: 5px;
+      border: 2px #f5f3f4 solid;
+      background: #f5f3f4;
+      outline: 0;
+
+      &:focus, &:active {
+        border: 2px #e4e4e4 solid;
+      }
+    }
+
+    > div.button-wrapper {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+
+      > input {
+        background: #dda19e;
+        color: white;
+        width: 80%;
+        height: 40px;
+        font-size: 1rem;
+        border: none;
+      }
+    }
+  }
+}
+
+input[type="date"], input[type="time"] {
+  margin: 10px;
+  border: none;
+  padding: 5px;
+  background: #f5f3f4;
+  color: black;
+}
+
+ul#priority li input {
+  display: none;
+}
+
+ul#priority li label {
+  display: inline-block;
+  padding: 5px 10px;
+  cursor: pointer;
+  
+  > span {
+    position:relative;
+    line-height: 22px;
+  }
+
+  > span:before, span:after {
+    content: '';
+  }
+
+  > span:before {
+    border: 2px solid #959393;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: top;
+    border-radius: 4px;
+  }
+
+  > span:after {
+    background: #959393;
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    top: 3px;
+    left: 5px;
+    transition: 0.3s;
+    opacity: 0;
+    border-radius: 2px;;
+  }
+
+  > input:checked+span:after {
+    opacity: 1;
+  }
+}
+
+div.addTask {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.2);
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  > div.formArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f5f3f4;
+    /*width: min(80vw, 800px);
+    height: min(80vh, 600px);*/
+    position: relative;
+    padding: 20px;
+    border-bottom: 2px solid #959393;
+    border-right: 2px solid #959393;
+
+    > p {
+      font-size: 2rem;
+      margin: 10px;
+    }
+
+    > button#close {
+      position: absolute;
+      top: 0;
+      right: 10px;
+      background: transparent;
+      border: none;
+      font-size: 2.5rem;
+      cursor: pointer;
+      aspect-ratio: 1;
+    }
+
+    > div.tabs {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+
+      > button {
+        background: #f5f3f4;
+        padding: 5px;
+        border: none;
+        transition: 0.2s all ease-out;
+        cursor: pointer;
+        font-size: 1rem;
+
+        &:hover {
+          background: #edacaa;
+        }
+      }
+
+      > button.active {
+        font-weight: bolder;
+        background: #dda19e;
+      }
+
+      > div.sep {
+        width: 0px;
+        border: 1px black solid;
+      }
+    }
+
+    > div.tabContents {
+      background: white;
+      margin-top: 20px;
+      padding: 20px;
+      border-bottom: 2px solid #e4e4e4;
+      border-right: 2px solid #e4e4e4;
+    }
+
+    > div.tabContents > div.tabcontent {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+form.addTask {
+  text-align: left;
+  width: 500px;
+  
+  > label {
+    width: 100%;
+  }
+
+  > textarea, ul {
+    width: 99%;
+  }
+
+  > div.button-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+
+    > input[type="submit"] {
+      width: 60%;
+      height: 40px;
+      color: white;
+      background: #dda19e;
+      border: none;
+      font-size: 1rem;
+    }
+  }
+
+}
+
+a.anim {
+  position: relative;
+  text-decoration: none;
+  color: #a17572;
+  transition: 0.2s ease all;
+}
+
+a.anim:hover {
+  color: #a17572;
+}
+
+a.anim:after {
+  content: "";
+  border-radius: 8px;
+  position: absolute;
+  display: block;
+  height: 2px;
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  transition: 0.2s ease-out all;
+  transform: scaleX(0);
+  background: #a17572;
+}
+
+a.anim:hover:after {
+  transform: scaleX(1);
+}
+
+div.tableHeader {
+  margin: 5px;
+  font-size: 2rem;
+
+  > button {
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: 0.2s all ease-out;
+
+    &:hover {
+      background-color: lightgrey;
+    }
+  }
+}
+
+table.calendar {
+  border-collapse: collapse;
+  height: 100%;
+  table-layout: fixed;
+  width: 100%;
+}
+
+tr.days td {
+  height: 0;
+  background: #d3d3d3;
+  border: 5px solid #d3d3d3;
+  font-weight: normal;
+  font-size: 1.2rem;
+  padding-bottom: 8px;
+}
+
+tr:nth-child(2) {
+  border-top: 20px #f5f3f4 solid;
+}
+
+table.calendar tr:not(.days) td {
+  background: #fff;
+
+  &:nth-child(6), &:nth-child(7) {
+    background: #e4e4e4;
+
+    div.task-wrapper ul.tasklist li.task {
+      background: #d3d3d3;
+    }
+  }
+}
+
+table, tbody, thead, tr, td {
+  padding: 4px;
+}
+
+tr, td {
+  margin: 5px;
+}
+
+tr:not(.days) td {
+  border: 5px solid #f5f3f4;
+}
+
+table tbody tr:not(.days) {
+  background: #f5f3f4;
+}
+
+table.calendar tbody tr td {
+  text-align: left;
+  vertical-align: top;
+}
+
+td.not-current {
+  color: grey;
+}
+
+div.task-wrapper {
+  display: block;
+  overflow-y: scroll;;
+}
+
+ul.tasklist {
+  list-style: none;
+  padding: 5px;
+  padding-top: 5px;
+  margin: 0;
+}
+
+ul.tasklist-expand {
+  list-style: none;
+  padding: 5px;
+}
+
+ul.tasklist-expand li.task-0 {
+  background-color: #c8c4c6;
+
+  > span.check {
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 2px solid #8c8a8a; 
+    border-radius: 4px;
+    align-self: center;
+    justify-self: center;
+    margin-right: 10px;
+    transition: 0.2s all ease-out;
+
+    &:hover {
+      background: transparent;
+    }
+  }
+  
+  > span.check.checked {
+    background: #8c8a8a;
+  }
+}
+
+ul.tasklist-expand li.task-1 {
+  background-color: #b9c3dd;
+
+  > span.check {
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 2px solid #898ea3; 
+    border-radius: 4px;
+    align-self: center;
+    justify-self: center;
+    margin-right: 10px;
+    transition: 0.2s all ease-out;
+
+    &:hover {
+      background: transparent;
+    }
+  }
+  
+  > span.check.checked {
+    background: #898ea3;
+  }
+}
+
+ul.tasklist-expand li.task-2 {
+  background-color: #e1c3bc;
+
+  > span.check {
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 2px solid #976c66; 
+    border-radius: 4px;
+    align-self: center;
+    justify-self: center;
+    margin-right: 10px;
+    transition: 0.2s all ease-out;
+
+    &:hover {
+      background: transparent;
+    }
+  }
+  
+  > span.check.checked {
+    background: #976c66;
+  }
+}
+
+td.focused div.task-wrapper ul.tasklist li.task {
+  background: #c8c4c6;
+  color: black;
+}
+
+li.task {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  background-color: #f5f3f4;
+  border-radius: 4px;
+  padding: 5px;
+  margin: 5px;
+  font-size: 0.8rem;
+}
+
+li.task.done {
+  text-decoration: line-through;
+  color: #c8c4c6;
+}
+
+td {
+  position: relative;
+}
+
+div.tasklist-panel {
+  position: absolute;
+  width: 200%;
+  top: 0;
+  right: -200%;
+  display: none;
+  background: transparent;
+  transition: 0.2s all ease-out;
+  z-index: 900;
+  border-bottom: 1px #8c8a8a solid;
+  border-right: 1px #8c8a8a solid;
+
+  > p.title {
+    font-size: 1rem;
+    position: relative;
+    margin: 0;
+    height: 25px;
+    z-index: -200;
+    background: #dda19e;
+    left:-50%;
+    width: 150%;
+    text-align: center;
+  }
+}
+
+td:nth-child(6) div.task-wrapper div.tasklist-panel, td:nth-child(7) div.task-wrapper div.tasklist-panel {
+  right: unset;
+  left: -200%;
+}
+
+table.calendar tbody tr:not(.days) td.focused {
+  background: #e4e4e4;
+
+  > span {
+    position:relative;
+    z-index: 901;
+  }
+}
+
+td.focused:has(ul.tasklist li) div.tasklist-panel {
+  display: block;
+  background: #e4e4e4;
+}
+
+li.task ul {
+  list-style: none;
+  padding: 2px;
+}
+
+li.secondary {
+  color: grey;
+}
+
+@media screen and (max-width: 600px) {
+
+}
