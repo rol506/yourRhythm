@@ -9,7 +9,7 @@
 
 ## Требования
 Для развертки сервиса требуется готовая модель ИИ в формате .gguf (Мы использовали Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf из 
-[bartowski/Meta-Llama-3.1-8B-Instruct-GGUF](https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF). Модель нужно поместить в models/ (относительно корня проекта) и назвать **kokos.gguf**
+[bartowski/Meta-Llama-3.1-8B-Instruct-GGUF](https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF)). Модель нужно поместить в models/ (относительно корня проекта) и назвать **kokos.gguf**
 Кроме того, требуется интерпретатор Python (версии не менее 3.14) и git.
 
 ## Запуск
