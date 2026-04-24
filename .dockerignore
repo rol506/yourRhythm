@@ -4,6 +4,7 @@ lib/
 lib64
 src/__pycache__/
 models/
+.git/
 pyvenv.cfg
 core.*
 flsite.db
