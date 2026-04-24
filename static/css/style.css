@@ -64,6 +64,12 @@ div.addClass {
 
 }
 
+a#logout {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
 aside {
   overflow: hidden;
   position: absolute;
@@ -631,13 +637,13 @@ ul.tasklist-expand {
 }
 
 ul.tasklist-expand li.task-0 {
-  background-color: #c8c4c6;
+  background-color: #c8cbb5;
 
   > span.check {
     width: 20px;
     height: 20px;
     background: white;
-    border: 2px solid #8c8a8a; 
+    border: 2px solid #87896f;
     border-radius: 4px;
     align-self: center;
     justify-self: center;
@@ -754,6 +760,10 @@ div.tasklist-panel {
 td:nth-child(6) div.task-wrapper div.tasklist-panel, td:nth-child(7) div.task-wrapper div.tasklist-panel {
   right: unset;
   left: -200%;
+
+  > p.title {
+    left: unset;
+  }
 }
 
 table.calendar tbody tr:not(.days) td.focused {
@@ -858,6 +868,37 @@ a.blank {
   text-decoration: none;
   cursor:pointer;
 }
+
+/*div.customLogin {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 15px;
+}
+
+#gosuslugi {
+  padding: 10px 40px;
+  border: 4px solid #d4ddeb;
+  background: #f3f7fd;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  color: #3962a6;
+  font-weight: bolder;
+}
+
+#google {
+
+  padding: 10px 40px;
+  border: 4px solid #d4ddeb;
+  background: #f3f7fd;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  color: #3962a6;
+  font-weight: bolder;
+}*/
 
 @media screen and (max-width: 1200px) {
   main {

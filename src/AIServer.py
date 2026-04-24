@@ -13,6 +13,11 @@ locale.setlocale(locale.LC_ALL, "ru_RU.utf-8")
 
 app = Flask("ai-server")
 app.config["AI_PORT"] = int(os.environ.get("AI_PORT", "4222"))
+
+if int(os.environ.get("DISABLE_AI", "0")) > 0:
+    print("[INFO] AI is disabled by environment variable")
+    exit(0)
+
 llm = Llama(model_path="models/kokos.gguf")
 
 @app.route("/process/<query>")

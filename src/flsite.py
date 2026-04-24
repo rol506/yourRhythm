@@ -25,8 +25,9 @@ app.config["WEB_PORT"] = int(os.environ.get("WEB_PORT", 4221))
 app.config["DEBUG"] = True
 app.config["AI_HOST"] = os.environ.get("AI_HOST", "127.0.0.1")
 app.config["AI_PORT"] = os.environ.get("AI_PORT", "4222")
+app.config["DISABLE_AI"] = os.environ.get("DISABLE_AI", "0")
 
-sqlFormat = "%Y%m%d%H%M%S"
+sqlFormat = "%Y:%m:%d %H:%M:%S"
 
 logging.basicConfig(encoding="utf-8", level=logging.INFO, 
                     format="%(levelname)s %(asctime)s %(message)s",
@@ -115,6 +116,9 @@ def addAITask():
         logout_user()
         if request.method == "POST":
             return abort(401)
+
+    if (int(app.config.get("DISABLE_AI")) > 0):
+        return redirect("/")
 
     form = AddTaskAIForm()
     if form.validate_on_submit():
@@ -399,6 +403,9 @@ def addTaskForChildAI():
         logout_user()
         if request.method == "POST":
             return abort(401)
+
+    if (int(app.config.get("DISABLE_AI")) > 0):
+        return redirect("/")
 
     form = AddTaskForChildAI()
     if form.validate_on_submit():
