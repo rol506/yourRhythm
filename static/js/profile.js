@@ -32,7 +32,7 @@ if (xhr.status === 200) {
 }
 
 const data = {
-  labels: ["Выолнено", "Не выполнено"],
+  labels: ["Выполнено", "Не выполнено"],
   datasets: [{
     data: [completed, all-completed],
     backgroundColor: ['#87896F', '#c0bbba'],
@@ -96,11 +96,14 @@ graphChart = new Chart(graph, {
     plugins: {
       legend: {
         display: false,
-      }
+      },
     },
     scales: {
       y: {
         beginAtZero: true,
+        ticks: {
+          stepSize: 1
+        }
       }
     }
   },
@@ -134,7 +137,7 @@ function updateCharts() {
   }
 
   const data = {
-    labels: ["Выолнено", "Не выполнено"],
+    labels: ["Выполнено", "Не выполнено"],
     datasets: [{
       data: [completed, all-completed],
       backgroundColor: ['#87896F', '#c0bbba'],

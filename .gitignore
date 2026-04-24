@@ -9,3 +9,4 @@ pyvenv.cfg
 core.*
 flsite.db
 log.txt
+cal.ics

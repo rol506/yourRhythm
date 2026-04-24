@@ -38,18 +38,26 @@ button#closeMobileMenu {
 
 div.addClass {
 
-  padding: 5px;
+  padding: 5px 0;
 
   > button.addClass {
-    vertical-align: middle;
     height: 100%;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     font-size: 1rem;
     background: none;
     border: none;
-    border-radius: 16px;
     padding: 10px;
     transition: 0.2s all ease-out;
+
+    &:active, &:focus {
+      background: #f6f4f5;
+      color: #959393;
+    }
+
+    > img {
+      vertical-align: bottom;
+    }
 
     &:hover {
       background: #ccc;
@@ -364,6 +372,17 @@ ul#priority li label {
   }
 }
 
+button#close, button#closeNotify {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 2.5rem;
+  cursor: pointer;
+  aspect-ratio: 1;
+}
+
 div.addTask {
   position: absolute;
   background: rgba(0, 0, 0, 0.2);
@@ -392,17 +411,6 @@ div.addTask {
     > p {
       font-size: 2rem;
       margin: 10px;
-    }
-
-    > button#close {
-      position: absolute;
-      top: 0;
-      right: 10px;
-      background: transparent;
-      border: none;
-      font-size: 2.5rem;
-      cursor: pointer;
-      aspect-ratio: 1;
     }
 
     > div.tabs {
@@ -463,10 +471,17 @@ form.addTask {
     width: 99%;
   }
 
+  > textarea {
+    background: #f5f3f4;
+    border: none;
+    padding: 10px;
+  }
+
   > div.button-wrapper {
     width: 100%;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
 
     > input[type="submit"] {
       width: 60%;
@@ -477,7 +492,21 @@ form.addTask {
       font-size: 1rem;
     }
   }
+}
 
+label.desc {
+  color: #959393;
+}
+
+#addTaskLoader {
+  border-color: black transparent black transparent;
+  margin-right: 20px;
+  display: none;
+}
+
+#dateWarning {
+  font-size: 0.8rem;
+  display: none;
 }
 
 a.anim {
@@ -602,7 +631,7 @@ tr, td {
   margin: 5px;
 }
 
-tr:not(.days) td {
+table.calendar tr:not(.days) td {
   border: 5px solid #f5f3f4;
 }
 
@@ -900,6 +929,45 @@ a.blank {
   font-weight: bolder;
 }*/
 
+div.classList {
+  display: inline-block;
+  background: #f6f4f5;
+  padding: 10px 0;
+  cursor: pointer;
+  width: 100%;
+
+  > span.class {
+    text-align:center;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: 0.2s all;
+    color: #959393;
+  }
+
+  > span.class.active {
+    background: #cdc8c8;
+    padding: 10px 60px;
+    color: black;
+  }
+}
+
+td.childTable {
+  padding: 20px;
+}
+
+img.childTable {
+  width: 40px;
+  height: 40px;
+}
+
+td.plus {
+  background: #cdc8c8;
+  padding:5px;
+  width:40px;
+  height:40px;
+  cursor:pointer;
+}
+
 @media screen and (max-width: 1200px) {
   main {
     padding: 15px;
@@ -1028,5 +1096,37 @@ a.blank {
 
   button#closeMobileMenu {
     display: block;
+  }
+
+  a.blank {
+    text-align: right;
+  }
+
+  td.childTable {
+    padding: 5px;
+    font-size: 0.6rem;
+  }
+
+  img.childTable {
+    width: 25px;
+    height: 25px;
+  }
+
+  td.plus {
+    width: 25px;
+    height: 25px;
+  }
+
+  div.classList {
+    padding: 5px 10px;
+  }
+
+  div.classList span.class {
+    font-size: 0.7rem;
+    padding: 5px 10px;
+  }
+
+  div.classList span.class.active {
+    padding: 5px 10px;
   }
 }

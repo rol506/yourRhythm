@@ -70,7 +70,7 @@ class FDataBase:
         return False
 
     def isTeacherFor(self, userID, teacherID) -> bool:
-        sql = f"""SELECT COUNT(*) AS cnt FROM teacherStudents WHERE studentID = '{userID}' AND teacherID = '{teacherID}'"""
+        sql = f"""SELECT COUNT(*) AS cnt FROM teacherStudents WHERE studentID = {userID} AND teacherID = '{teacherID}'"""
         try:
             self.__cur.execute(sql)
             res = self.__cur.fetchone()
@@ -136,7 +136,7 @@ class FDataBase:
 
     def getTaskByID(self, id):
         # TODO make protection from direct access (only user who created may access their personal tasks)
-        sql = f"""SELECT * FROM tasks WHERE id = '{id}'"""
+        sql = f"""SELECT * FROM tasks WHERE id = {id}"""
         try:
             self.__cur.execute(sql)
             res = self.__cur.fetchone()
@@ -147,7 +147,7 @@ class FDataBase:
 
     def undoTask(self, id):
         # TODO make protection from direct access (only user who created may access their personal tasks)
-        sql = f"""UPDATE tasks SET isDone = '0' WHERE id = '{id}'"""
+        sql = f"""UPDATE tasks SET isDone = '0' WHERE id = {id}"""
         try:
             self.__cur.execute(sql)
             self.__db.commit()
@@ -168,7 +168,7 @@ class FDataBase:
         return False
 
     def getCompletedTasks(self, userID):
-        sql = f"""SELECT COUNT(*) as cnt FROM tasks WHERE ownerID = '{userID}' AND isDone > 0"""
+        sql = f"""SELECT COUNT(*) as cnt FROM tasks WHERE ownerID = {userID} AND isDone > 0"""
         try:
             self.__cur.execute(sql)
             res = self.__cur.fetchone()
@@ -177,8 +177,28 @@ class FDataBase:
             logging.error("Cannot fetch completed task count: " + str(e))
         return 0
 
+    def getCompletedHometasks(self, userID):
+        sql = f"""SELECT COUNT(*) as cnt FROM tasks WHERE ownerID = {userID} AND isDone > 0 AND ownerID != createdByID"""
+        try:
+            self.__cur.execute(sql)
+            res = self.__cur.fetchone()
+            if res: return res["cnt"]
+        except Exception as e:
+            logging.error("Cannot fetch completed task count: " + str(e))
+        return 0
+
+    def getHometaskCount(self, userID):
+        sql = f"""SELECT COUNT(*) as cnt FROM tasks WHERE ownerID = {userID} AND ownerID != createdByID"""
+        try:
+            self.__cur.execute(sql)
+            res = self.__cur.fetchone()
+            if res: return res["cnt"]
+        except Exception as e:
+            logging.error("Cannot fetch task count: " + str(e))
+        return 0
+
     def getTaskCount(self, userID):
-        sql = f"""SELECT COUNT(*) as cnt FROM tasks WHERE ownerID = '{userID}'"""
+        sql = f"""SELECT COUNT(*) as cnt FROM tasks WHERE ownerID = {userID}"""
         try:
             self.__cur.execute(sql)
             res = self.__cur.fetchone()
@@ -211,3 +231,67 @@ class FDataBase:
             logging.error("Cannot fetch students: " + str(e))
         return []
 
+    def getRemainingHometasks(self, userID):
+        sql = f"""SELECT task FROM tasks WHERE isDone < 1 AND ownerID != createdByID AND ownerID = {userID}"""
+        try:
+            self.__cur.execute(sql)
+            r = self.__cur.fetchall()
+            res = []
+            for rs in r:
+                res.append(rs['task'])
+            if res: return res
+        except Exception as e:
+            logging.error("Cannot get remaining hometasks: " + str(e))
+        return []
+
+    def getRemainingTasks(self, userID):
+        sql = f"""SELECT task FROM tasks WHERE isDone < 1 AND ownerID = {userID}"""
+        try:
+            self.__cur.execute(sql)
+            r = self.__cur.fetchall()
+            res = []
+            for rs in r:
+                res.append(rs['task'])
+            if res: return res
+        except Exception as e:
+            logging.error("Cannot get remaining tasks: " + str(e))
+        return []
+
+    def getRemainingHometasksClass(self, classID):
+        sql = f"""SELECT tasks.task as task, users.email as email FROM tasks
+LEFT JOIN teacherStudents ON tasks.ownerID = teacherStudents.studentID 
+LEFT JOIN users ON users.id = teacherStudents.studentID
+WHERE classID = {classID} AND isDone < 1"""
+        try:
+            self.__cur.execute(sql)
+            r = self.__cur.fetchall()
+            res = {}
+            for rs in r:
+                res[rs["email"]] = res.get(rs["email"], [])
+                res[rs["email"]].append(rs["task"])
+            if res: return res
+        except Exception as e:
+            logging.error("Cannot get remaining hometasks for class members: " + str(e))
+        return {}
+
+    def getUserTasks(self, userID):
+        sql = f"""SELECT * FROM tasks WHERE ownerID = {userID}"""
+        try:
+            self.__cur.execute(sql)
+            res = self.__cur.fetchall()
+            if res: return res
+        except Exception as e:
+            logging.error("Cannot get user tasks: " + str(e))
+        return None
+    def getClasses(self):
+        sql = f"""SELECT DISTINCT classID, className FROM teacherStudents ORDER BY className ASC"""
+        try:
+            self.__cur.execute(sql)
+            rr = self.__cur.fetchall()
+            res = {}
+            for r in rr:
+                res[r["className"]] = r["classID"]
+            if res: return res
+        except Exception as e:
+            logging.error("Cannot fetch classes: " + str(e))
+        return {}

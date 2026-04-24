@@ -1,12 +1,14 @@
-from math import log
-from flask import Flask, abort, g, jsonify, redirect, render_template, flash, request, session
+from flask import Flask, abort, g, jsonify, redirect, render_template, flash, request, send_file, session, url_for
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
 from dotenv import load_dotenv
-from defs import AddTaskAIForm, AddTaskForChild, AddTaskForm, AddTaskForChildAI, LoginForm, RegisterForm, User
+from defs import AddTaskAIForm, AddTaskForChild, AddTaskForm, AddTaskForChildAI, LoginForm, RegisterForm, SendNotification, SendNotificationAI, User
 from werkzeug.security import check_password_hash, generate_password_hash
 from FDataBase import FDataBase
 from datetime import datetime
 from urllib.parse import unquote, quote
+from Emails import EmailSender
+from ics import Calendar, Event
+from io import BytesIO, RawIOBase, StringIO, TextIOWrapper
 import os
 import sqlite3
 import logging
@@ -17,6 +19,7 @@ import requests
 load_dotenv()
 
 app = Flask("calendar-web", static_folder="static/", template_folder="templates/")
+emailer = EmailSender()
 loginManager = LoginManager()
 loginManager.init_app(app)
 
@@ -27,9 +30,9 @@ app.config["AI_HOST"] = os.environ.get("AI_HOST", "127.0.0.1")
 app.config["AI_PORT"] = os.environ.get("AI_PORT", "4222")
 app.config["DISABLE_AI"] = os.environ.get("DISABLE_AI", "0")
 
-sqlFormat = "%Y:%m:%d %H:%M:%S"
+sqlFormat = "%Y-%m-%d %H:%M:%S"
 
-logging.basicConfig(encoding="utf-8", level=logging.INFO, 
+logging.basicConfig(encoding="utf-8", level=logging.DEBUG, 
                     format="%(levelname)s %(asctime)s %(message)s",
                     handlers=[logging.FileHandler("log.txt", ("w" if app.config["DEBUG"] else "w+")), logging.StreamHandler(sys.stdout)])
 
@@ -88,6 +91,37 @@ def index():
 
     return render_template("index.html", user=usr, form=form, aiForm=aiForm)
 
+@app.route("/download")
+@login_required
+def download():
+    dbase = FDataBase(get_db())
+    usr = dbase.getUserByID(current_user.get_id())
+    if usr is None:
+        logout_user()
+        if request.method == "POST":
+            return abort(401)
+
+    tasks = dbase.getUserTasks(current_user.get_id())
+    if tasks is None:
+        return abort(500)
+
+    c = Calendar()
+    for t in tasks:
+        if int(t["isDone"]) > 0:
+            continue
+
+        e = Event()
+        e.name = t["task"]
+        e.begin = t["deadline"]
+        c.events.add(e)
+        buf = BytesIO()
+        buf.write(c.serialize().encode())
+        f = open("cal.ics", "w")
+        f.writelines(c.serialize_iter())
+        f.close()
+        f = open("cal.ics", "rb")
+    return send_file(f, download_name="Your-Rhythm-Imported.ics", as_attachment=True)
+
 @app.route("/calendar/<id>")
 @login_required
 def calendar(id):
@@ -123,7 +157,7 @@ def addAITask():
     form = AddTaskAIForm()
     if form.validate_on_submit():
         print("got ai request:", form.task.data)
-        res = requests.get("http://" + app.config["AI_HOST"] + ":" + str(app.config["AI_PORT"]) + "/process/" + quote(form.task.data.strip())).content
+        res = requests.get("http://" + app.config["AI_HOST"] + ":" + str(app.config["AI_PORT"]) + "/processTasks/" + quote(form.task.data.strip())).content
         print("got ai answer:",res)
         res = json.loads(unquote(res))
         for t in res:
@@ -262,6 +296,19 @@ def taskCount():
     res = dbase.getTaskCount(current_user.get_id())
     return jsonify({"taskCount": res})
 
+@app.route("/getTaskCount/<date>")
+@login_required
+def taskCountOnDate(date):
+    dbase = FDataBase(get_db())
+    usr = dbase.getUserByID(current_user.get_id())
+    if usr is None:
+        # Do not redirect and chenge session["next"] on API-like routes
+        logout_user()
+        return abort(401)
+
+    tasks = dbase.getTasksOnDate(datetime.strptime(date, "%Y-%m-%d"), current_user.get_id())
+    return jsonify({"count":len(tasks)})
+
 @app.route("/getCompletionStats/<date>")
 @login_required
 def completionStats(date):
@@ -345,10 +392,7 @@ def profile():
 @login_required
 def classes(): 
     dbase = FDataBase(get_db())
-    usr = dbase.getUserByID(current_user.get_id())
-    form = AddTaskForChild()
-    form.id.data = current_user.get_id()
-    aiForm = AddTaskAIForm()
+    usr = dbase.getUserByID(current_user.get_id()) 
     if usr is None:
         logout_user()
         if request.method == "POST":
@@ -357,19 +401,26 @@ def classes():
             session["next"] = request.path
             return redirect("/login") 
 
+    form = AddTaskForChild()
+    form.id.data = current_user.get_id()
+    aiForm = AddTaskForChildAI()
+    notifyForm = SendNotification()
+    notifyFormAI = SendNotificationAI()
+
     cl = dbase.getStudents(current_user.get_id())
+    classIDs = dbase.getClasses()
     res = {}
     for s in cl:
         print
-        all = dbase.getTaskCount(s["id"])
-        completed = dbase.getCompletedTasks(s["id"])
+        all = dbase.getHometaskCount(s["id"])
+        completed = dbase.getCompletedHometasks(s["id"])
         s["all"] = all
         s["completed"] = completed
         s["percent"] = int(completed/all*100) if all > 0 else 0
         res[s["className"]] = res.get(s["className"], [])
         res[s["className"]].append(dict(s))
 
-    return render_template("class.html", form=form, aiForm=aiForm, user=usr, classes=res)
+    return render_template("class.html", form=form, aiForm=aiForm, user=usr, classes=res, notifyForm=notifyForm, notifyFormAI=notifyFormAI, classIDs=classIDs)
 
 @app.route("/addTaskChild", methods=["POST"])
 @login_required
@@ -409,17 +460,64 @@ def addTaskForChildAI():
 
     form = AddTaskForChildAI()
     if form.validate_on_submit():
-        print("got ai request:", form.task.data)
-        res = requests.get("http://" + app.config["AI_HOST"] + ":" + str(app.config["AI_PORT"]) + "/process/" + quote(form.task.data.strip())).content
-        print("got ai answer:",res)
+        res = requests.get("http://" + app.config["AI_HOST"] + ":" + str(app.config["AI_PORT"]) + "/processTasks/" + quote(form.task.data.strip())).content
         res = json.loads(unquote(res))
         for t in res:
             dbase.addTask(t["task"], datetime.strptime(t["date"] + " " + t["time"], "%d/%m/%Y %H:%M"), form.id.hidden, current_user.get_id(), form.priority.data)
 
-        return redirect("/classes")
+    return redirect("/classes")
+
+@app.route("/notify/", methods=["POST"])
+@login_required
+def notify():
+    dbase = FDataBase(get_db())
+    usr = dbase.getUserByID(current_user.get_id())
+    if usr is None:
+        logout_user()
+        if request.method == "POST":
+            return abort(401)
+    
+    form = SendNotification()
+    if form.validate_on_submit():
+        if int(form.id.data) < 0:
+            classID = int(form.id.data) * -1
+            res = dbase.getRemainingHometasksClass(classID)
+            for email, tasks in res.items():
+                logging.debug("Sending mail to " + email)
+                if email.split('@')[1] == 'example.com':
+                    continue
+                emailer.sendHometaskReminder(tasks, [email], form.text.data)
+        else:
+            userID = form.id.data
+            res = dbase.getRemainingHometasks(userID)
+            user = dbase.getUserByID(userID)
+            logging.debug("Sending mail to " + user["email"])
+            if user["email"].split('@')[1] == 'example.com':
+                return redirect("/classes")
+            emailer.sendHometaskReminder(tasks, [user["email"]], form.text.data)
 
     return redirect("/classes")
 
+@app.route("/notifyAI/", methods=["POST"])
+@login_required
+def notifyAI():
+    dbase = FDataBase(get_db())
+    usr = dbase.getUserByID(current_user.get_id())
+    if usr is None:
+        logout_user()
+        if request.method == "POST":
+            return abort(401)
+    
+    # TODO make notifications with AI
+
+    form = SendNotification()
+    if form.validate_on_submit():
+        if int(form.id.data) < 0:
+            classID = int(form.id.data) * -1
+        else:
+            userID = form.id.data
+
+    return redirect("/classes")
 
 @app.route("/logout")
 @login_required

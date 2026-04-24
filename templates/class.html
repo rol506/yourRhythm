@@ -53,6 +53,7 @@
                   {{form.deadlineDate.label()}}<br>
                   {{form.deadlineDate()}}
                   {{form.deadlineTime()}}
+                  <div id="dateWarning">У вас много задач в этот день.<br>Может, стоит выбрать другой?</div>
                 </div>
               </div><br><br>
               <div class="button-wrapper">{{form.submit()}}</div>
@@ -85,11 +86,42 @@
                     </label>
                   </li>
                 </ul>
-              <div class="button-wrapper">{{aiForm.submit()}}</div>
+              <div class="button-wrapper"><div class="spin" id="addTaskLoader" style="width: 20px; height: 20px"></div>{{aiForm.submit()}}</div>
             </form>
           </div>
         </div>
         <button id="close">×</button>
+      </div>
+    </div>
+    <div class="addTask" id="panelNotify" style="display: none;">
+      <div class="formArea">
+      <p>Отправить напоминание</p>
+        <div class="tabs">
+          <button onclick="openTabNotify(event, 'manualNotify')" id="manualNotify">Вручную</button>
+          <div class="sep"></div>
+          <button onclick="openTabNotify(event, 'aiAssistNotify')" id="aiAssistNotify">AI-помощник (beta)</button>
+        </div>
+        <div class="tabContents">
+          <div class="tabcontent" id="manualNotifyPanel">
+            <form action="/notify" method="post" class="addTask">
+              {{notifyForm.hidden_tag()}}
+              <label class="desc">Каждому ученику выбранного класса на почту отправится список не выполненных им заданий с указанным вами сообщением (оставьте пустым, чтобы использовать текст по умолчанию)</label><br><br>
+              {{notifyForm.text.label()}}
+              {{notifyForm.text()}}
+              {{notifyForm.id()}}<br><br>
+              <div class="button-wrapper">{{notifyForm.submit()}}</div>
+            </form>
+          </div>
+          <div class="tabcontent" id="aiAssistNotifyPanel">
+            <form action="/notifyAI" method="post" class="addTask">
+              {{notifyFormAI.hidden_tag()}}
+              {{notifyFormAI.id()}}
+              <label class="desc">Каждому ученику выбранного класса на почту отправится список не выполненных им заданий с персональным сообщением от ИИ</label><br><br>
+              <div class="button-wrapper">{{notifyFormAI.submit()}}</div>
+            </form>
+          </div>
+        </div>
+        <button id="closeNotify">×</button>
       </div>
     </div>
     <div class="container">
@@ -101,7 +133,7 @@
             <img src="{{url_for('static', filename='images/blank-avatar.png')}}" width="30px" height="30px"></div>
           <br>
           <a href="#" id="addTask"><div class="inline">
-            <p>Добавить задание</p><img src="{{url_for('static', filename='images/plus.png')}}" width="30px" height="30px"></div>
+            <p>Добавить задание себе</p><img src="{{url_for('static', filename='images/plus.png')}}" width="30px" height="30px"></div>
           </a>
           <a href="/"><div class="inline"><p>Мой календарь</p>
           <img src="{{url_for('static', filename='images/arrow.png')}}" alt="" width="31px" height="30px"></div></a> 
@@ -119,20 +151,55 @@
       <main>
         {% if classes %}
         <div class="tableHeader">Классы</div>
-        <div class="accordion">
+        <div class="classList" id="classList">
+        {% for name, id in classIDs.items() %}
+          <span class="class">{{name}}</span>
+        {% endfor %}
+        </div>
+        <div class="classes">
+          <div class="addClass">
+            <button class="addClass" onclick="addTaskChildClass()">
+            <img src="{{url_for('static', filename='images/plus-dark.png')}}" width="30px" height="30px">
+            <span>Выдать задание классу</span></button>
+            
+            <button class="addClass" onclick="notifyChildClass()">
+            <img src="{{url_for('static', filename='images/plus-dark.png')}}" width="30px" height="30px">
+            <span>Напомнить не сдавшим задания</span></button>
+          </div>
+        {% for name, children in classes.items() %}
+        {% if children %}
+        <table id="class-{{children[0].classID}}" style="display: none;">
+          {% for c in children %}
+            <tr><td class="plus" onclick='addTaskChild({{c.id}})'><img class="childTable" src="{{url_for('static', filename='images/plus.png')}}"></td>
+            <td class="childTable">{{c.name}}</td>
+            <td class="childTable" style="color: #959393;">Выполнено на этой неделе: {{c.completed}}/{{c.all}} ({{c.percent}}%)</td></tr>
+          {% endfor %}
+        </table>
+        {% endif %}
+        {% endfor %}
+        </div>
+        <!--<div class="accordion">
           {% for name, children in classes.items() %}
             <button class="accordion">{{name}}</button>
             <div class="acc-panel">
               <div class="acc-wrapper">
               {% if children %}
-              <div class="addClass"><button class="addClass" onclick="addTaskChild(-{{children[0].classID}})"><img src="{{url_for('static', filename='images/plus-dark.png')}}" width="15px" height="15px">
-              <span>Выдать задание классу</span></button></div>
+              <div class="addClass">
+                <button class="addClass" onclick="addTaskChild(-{{children[0].classID}})">
+                <img src="{{url_for('static', filename='images/plus-dark.png')}}" width="15px" height="15px">
+                <span>Выдать задание классу</span></button>
+                
+                <button class="addClass" onclick="notifyChild(-{{children[0].classID}})">
+                <img src="{{url_for('static', filename='images/plus-dark.png')}}" width="15px" height="15px">
+                <span>Напомнить не сдавшим задания</span></button>
+              </div>
               <table>
                 {% for c in children %}
                   <tr class="child child-{{c.id}}">
                     <td class="btn"><button class="addTaskChild" onclick="addTaskChild({{c.id}})" title="Задать личное задание">
                     <img src="{{url_for('static', filename='images/plus.png')}}" width="15px" height="15px"></button></td>
-                    <td><span>{{c.name}}</span></td><td><span>Выполнено на этой неделе: {{c.completed}}/{{c.all}} ({{c.percent}}%)</span></td>
+                    <td><span>{{c.name}}</span></td><td><span>Выполнено на этой неделе: <b>{{c.completed}}</b>/{{c.all}} ({{c.percent}}%)</span></td>
+                    <td><span><button class="addTaskChild" onclick="notifyChild({{c.id}})">Напомнить о не сданных заданиях</button></span></td>
                   </tr>
               {% endfor %}
               {% endif %}
@@ -140,7 +207,7 @@
               </div>
             </div>
           {% endfor %}
-        </div>
+        </div>-->
         {% endif %}
         {% if children %}
         <div class="tableHeader">Дети</div>
@@ -148,22 +215,100 @@
       </main>
       </div>
     </div>
+    <script>
+    const addTaskLoader = document.getElementById("addTaskLoader");
+    const form = document.forms[1];
+    
+    function startLoader() {
+      for (var el of form.elements) {
+        if (!el.checkValidity()) {
+          return;
+        }
+      }
+      addTaskLoader.style.display = "block";
+    }
+    </script>
     <script src="{{url_for('static', filename='js/addTask.js')}}" defer></script>
     <script>
     const hidden = document.getElementById("hidden");
     const hiddenAI = document.getElementById("hiddenAI");
+    const hiddenNotify = document.getElementById("hiddenNotify");
+    const hiddenNotifyAI = document.getElementById("hiddenNotifyAI");
     const loader = document.getElementById("loader");
     const def = "{{user.id}}";
+    const notifyPanel = document.getElementById("panelNotify");
+    const notifyClose = document.getElementById("closeNotify");
+    const classes = document.getElementById("classList");
+    const classIDs = {
+      {% for name, id in classIDs.items() %}
+      "{{name}}": {{id}},
+      {% endfor %}
+    }
+
+    classes.children[0].classList.add("active");
+    var activeClass = classes.children[0];
+    document.getElementById("class-"+classIDs[activeClass.innerHTML]).style.display = "table";
+    for (var c of classes.children) {
+      c.onclick = function() {
+        activeClass.classList.remove("active");
+        document.getElementById("class-"+classIDs[activeClass.innerHTML]).style.display = "none";
+        this.classList.add("active");
+        document.getElementById("class-"+classIDs[this.innerHTML]).style.display = "table";
+        activeClass = this;
+      }
+    }
+
+    var activeNotify = document.getElementById("manualNotify");
+    activeNotify.classList.add("active");
+    document.getElementById("manualNotifyPanel").style.display = "flex";
+
     function addTaskChild(id) {
       if (id === undefined) {
         hidden.value = def;
+        hiddenAI.value = def;
+      } else {
+        hidden.value = id;
+        hidden.value = id;
       }
-      hidden.value = id;
       panel.style.display = "flex";
       openTab("", "manual");
     }
-    loader.style.display = "none";
 
+    function addTaskChildClass() {
+      hidden.value = Number(classIDs[activeClass.innerHTML]) * -1;
+      hiddenAI.value = Number(classIDs[activeClass.innerHTML]) * -1;
+      panel.style.display = "flex";
+      openTab("", "manual");
+    }
+
+    function openTabNotify(_, tabName) {
+      var d = document.getElementById(tabName);
+      document.getElementById(activeNotify.id + "Panel").style.display = "none";
+      document.getElementById(tabName + "Panel").style.display = "flex";
+      activeNotify.classList.remove("active");
+      d.classList.add("active");
+      activeNotify = d;
+    }
+
+    function notifyChild(id) {
+      hiddenNotify.value = id;
+      hiddenNotifyAI.value = id;
+      notifyPanel.style.display = "flex";
+      openTabNotify("", "manualNotify");
+    }
+
+    function notifyChildClass() {
+      hiddenNotify.value = Number(classIDs[activeClass.innerHTML]) * -1;
+      hiddenNotifyAI.value = Number(classIDs[activeClass.innerHTML]) * -1;
+      notifyPanel.style.display = "flex";
+      openTabNotify("", "manualNotify");
+    }
+
+    notifyClose.onclick = function() {
+      notifyPanel.style.display = "none";
+    }
+
+    loader.style.display = "none";
     </script>
 
     <script src="{{url_for('static', filename='js/accordion.js')}}"></script>

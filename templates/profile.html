@@ -53,6 +53,7 @@
                   {{form.deadlineDate.label()}}<br>
                   {{form.deadlineDate()}}
                   {{form.deadlineTime()}}
+                  <div id="dateWarning">У вас много задач в этот день.<br>Может, стоит выбрать другой?</div>
                 </div>
               </div><br><br>
               <div class="button-wrapper">{{form.submit()}}</div>
@@ -85,7 +86,7 @@
                       </label>
                     </li>
                   </ul>
-              <div class="button-wrapper">{{aiForm.submit()}}</div>
+              <div class="button-wrapper"><div class="spin" id="addTaskLoader" style="width: 20px; height: 20px"></div>{{aiForm.submit()}}</div>
             </form>
           </div>
         </div>
@@ -156,6 +157,19 @@
       </main>
       </div>
     </div>
+    <script>
+    const addTaskLoader = document.getElementById("addTaskLoader");
+    const form = document.forms[1];
+    
+    function startLoader() {
+      for (var el of form.elements) {
+        if (!el.checkValidity()) {
+          return;
+        }
+      }
+      addTaskLoader.style.display = "block";
+    }
+    </script>
     <script src="{{url_for('static', filename='js/addTask.js')}}"></script>
     <script>
 let completed = {{completed}};

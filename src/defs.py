@@ -42,7 +42,7 @@ class AddTaskForm(FlaskForm):
 class AddTaskAIForm(FlaskForm):
     task = TextAreaField("Опишите задание:", render_kw={"placeholder": "Например: В среду нужно вынести мусор."}, validators=[DataRequired()])
     priority = RadioField("Приоритет:", choices=[('0', 'Низкий'), ('1','Средний'), ('2','Высокий')])
-    submit = SubmitField("Добавить задания")
+    submit = SubmitField("Добавить задания", render_kw={"onclick": "startLoader()"})
 
 class AddTaskForChild(FlaskForm):
     task = TextAreaField("Опишите задание:", validators=[DataRequired()])
@@ -58,3 +58,11 @@ class AddTaskForChildAI(FlaskForm):
     id = HiddenField("userID", render_kw={"id": "hiddenAI"}, validators=[DataRequired()])
     submit = SubmitField("Добавить задания")
 
+class SendNotification(FlaskForm):
+    text = TextAreaField("Напишите сообщение:", default="Здравствуйте! У вас остались невыполненные задания. Пора приступить к выполнению =).")
+    id = HiddenField("userID", render_kw={"id": "hiddenNotify"}, validators=[DataRequired()])
+    submit = SubmitField("Отправить уведомление")
+
+class SendNotificationAI(FlaskForm):
+    id = HiddenField("userID", render_kw={"id": "hiddenNotifyAI"}, validators=[DataRequired()])
+    submit = SubmitField("Отправить уведомление")

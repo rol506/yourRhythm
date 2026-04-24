@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+<style>
+* {
+  font-family: "Sansation", sans-serif;
+}
+
+html, body{
+  margin: 0;
+}
+
+nav {
+  background: #211e1e;
+  color: white;
+  font-weight: bolder;
+  padding: 5px;
+  font-size: 1.7rem;
+}
+
+main {
+  padding: 20px;
+}
+
+ul {
+  padding-left: 20px;
+}
+</style>
+  </head>
+  <body>
+    <nav>
+      <span style="color: white;width:100%;text-align:center;display:block;">ТВОЙ РИТМ</span></nav>
+    <main>
+      <p><b>{{header}}</b></p>
+      <ul>
+        {% for t in tasks %}
+        <li>{{t}}</li>
+        {% endfor %}
+      </ul>
+      <p>Это сообщение отправлено сервисом <b style="white-space: nowrap;">ТВОЙ РИТМ</b> и на него не стоит отвечать</p>
+    </main>
+  </body></html>
