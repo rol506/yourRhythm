@@ -7,12 +7,11 @@ let label = document.getElementById("calLabel");
 let focused = [];
 
 function formatDateTime(d) {
-  return "" + d.getDay() + "-" + d.getMonth() + "-" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes();
+  return "" + d.getDate() + "-" + d.getMonth() + "-" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes();
 }
 
 function toggleTask(el, id) {
   fetch("/getTask/" + id).then((responce) => {
-    console.log(responce);
     if (responce.status != 200) {
       return;
     }
@@ -43,6 +42,7 @@ var Cal = function(divId) {
     'Суббота',
     'Воскресенье'
   ];
+  this.ShortDaysOfWeek = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
   this.Months =['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
   var d = new Date();
   this.currMonth = d.getMonth();
@@ -88,7 +88,7 @@ Cal.prototype.showMonth = function(y, m) {
   //html += '<thead><tr>';
   //html += '<td colspan="7">' + this.Months[m] + ' ' + y + '</td>';
   //html += '</tr></thead>';
-  html += '<tr class="days">';
+  html += '<tr class="days pc">';
   for(var i=0; i < this.DaysOfWeek.length;i++) {
     if (i >= 5)
     {
@@ -97,7 +97,11 @@ Cal.prototype.showMonth = function(y, m) {
       html += '<td style="text-align: center;">' + this.DaysOfWeek[i] + '</td>';
     }
   }
-  html += '</tr>';
+  html += '</tr><tr class="days phone">';
+  for(var i=0;i<this.ShortDaysOfWeek.length;i++) {
+    html += '<td style="text-align: center;">' + this.ShortDaysOfWeek[i] + '</td>';;
+  }
+  html += "</td>";
   var i=1;
   do {
     var dow = new Date(y, m, i).getDay();

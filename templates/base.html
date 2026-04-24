@@ -15,6 +15,7 @@
   </head>
   <body>
     {% block body %}
+    <script src="{{url_for('static', filename='js/mobile.js')}}" defer></script>
     <div class="flashed">
       {% for cat, msg in get_flashed_messages(True) %}
         <div class="flash-{{cat}}">{{msg}}</div>

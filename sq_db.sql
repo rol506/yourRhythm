@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS teacherStudents (
+  classID INTEGER PRIMARY KEY AUTOINCREMENT,
   className TEXT NOT NULL,
   studentID INTEGER REFERENCES users(id),
   teacherID INTEGER REFERENCES users(id)
@@ -20,8 +21,9 @@ CREATE TABLE IF NOT EXISTS tasks (
   id INTEGER PRIMARY KEY  AUTOINCREMENT,
   task TEXT NOT NULL,
   priority INTEGER NOT NULL,
-  deadline DATETIME,
+  deadline STRING,
   isDone INT NOT NULL,
+  completionDate STRING,
   ownerID INTEGER REFERENCES users(id),
   createdByID INTEGER REFERENCES users(id)
 )

@@ -19,12 +19,58 @@ div.container, div.wrapper, main, div#calendar {
   height: 100%;
 }
 
+button.menu {
+  display: none;
+  background: none;
+  border: none;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+button#closeMobileMenu {
+  display: none;
+  background: none;
+  border: none;
+  margin-bottom: 20px;
+  transform: rotate(45deg);
+  cursor: pointer;
+}
+
+div.addClass {
+
+  padding: 5px;
+
+  > button.addClass {
+    vertical-align: middle;
+    height: 100%;
+    display: inline-block;
+    font-size: 1rem;
+    background: none;
+    border: none;
+    border-radius: 16px;
+    padding: 10px;
+    transition: 0.2s all ease-out;
+
+    &:hover {
+      background: #ccc;
+    }
+
+    > span {
+      height: 100%;
+      vertical-align: middle;
+      display: inline-block;
+    }
+  }
+
+}
+
 aside {
+  overflow: hidden;
   position: absolute;
   top: 0;
   left: -250px;
   width: 300px;
-  height: calc(100vh - 10px);
+  height: calc(100% - 10px);
   transition: all 0.2s ease-out;
   background-color: #211e1e;
   padding: 10px 0 0 0;
@@ -122,6 +168,64 @@ main {
   padding: 80px;
   padding-top: 15px;
   height: calc(100% - 100px);
+}
+
+div.grid {
+  display: grid;
+  grid-template-columns: 350px 2fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas: "stats tasks tasks"
+                        "graph graph graph";
+  width: 100%;
+  height: 100%;
+  gap: 20px;
+  margin-top: 30px;
+  background-color: #f5f3f4;
+  padding: 20px;
+}
+
+div.stats, div.tasks, div.graph {
+  border-right: 2px solid #e4e4e4;
+  border-bottom: 2px solid #e4e4e4;
+  background: white;
+}
+
+div.tasks {
+
+  > div.block {
+    display: block;
+    border-bottom: 2px solid #e4e4e4;
+    padding: 20px;
+    font-size: 2rem;
+  }
+}
+
+div.stats {
+  padding: 20px;
+  aspect-ratio: 1/1;
+  display: block;
+
+  > canvas {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.chartTitle {
+  font-size: 1.2rem;
+}
+
+p.chartText {
+  position: relative;
+  top: calc(-50% - 2rem);
+  text-align: center;
+  font-size: 2rem;
+  margin: 0;
+  height: 0;
+}
+
+div.graph {
+  padding: 10px;
 }
 
 div.form-wrapper {
@@ -431,6 +535,7 @@ a.anim-title:hover:after {
 div.tableHeader {
   margin: 5px;
   font-size: 2rem;
+  font-weight: bolder;
 
   > button {
     background: transparent;
@@ -463,7 +568,11 @@ tr.days td {
   padding-bottom: 8px;
 }
 
-tr:nth-child(2) {
+tr.days.phone {
+  display: none;
+}
+
+tr:nth-child(3) {
   border-top: 20px #f5f3f4 solid;
 }
 
@@ -668,8 +777,215 @@ li.task ul {
 
 li.secondary {
   color: grey;
+  font-size: 0.6rem;
+}
+
+nav span:last-child {
+  text-align: right;
+}
+
+button.accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+}
+
+button.accordion:before {
+  content: '\02795';
+  font-size: 13px;
+  color: #777;
+  float: right;
+  margin-left: 5px;
+}
+
+button.accordion.active:before {
+  content: '\2796';
+}
+
+.acc-panel {
+  padding: 0 18px;
+  background-color: white;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.2s ease-out;
+
+  > .acc-wrapper {
+    padding: 0px 15px 20px 15px;
+  }
+}
+
+button.addTaskChild {
+  background: #bbb;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 5px;
+  margin-right: 10px;
+  transition: 0.2s all ease-out;
+  cursor: pointer;
+
+  &:hover {
+    background: #aaa;
+  }
+}
+
+button.accordion.active, button.accordion:hover {
+  background-color: #ccc;
+}
+
+div.child-wrapper {
+  background: #ddd;
+  padding: 15px;
+  display: inline-block;
+  width: 100%;
+
+  > .child {
+
+    > span {
+      height: 100%;
+      display: inline-block;
+    }
+  }
+}
+
+a.blank {
+  color: white;
+  text-decoration: none;
+  cursor:pointer;
+}
+
+@media screen and (max-width: 1200px) {
+  main {
+    padding: 15px;
+  }
+
+  tr.days.pc {
+    display: none;
+  }
+  tr.days.phone {
+    display: table-row;
+
+    > td {
+      border: 2px solid #d3d3d3;
+    }
+  }
+
+  tr:not(.days) td {
+    border: 2px solid #f5f3f4;
+    padding: 1px;
+  }
 }
 
 @media screen and (max-width: 600px) {
+  div.grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr 1fr;
+    grid-template-areas: "stats"
+                          "tasks"
+                          "graph"
+  }
+  main {
+    padding: 5px;
+  }
 
+  div.stats {
+    aspect-ratio: unset;
+  }
+
+  div.tableHeader, #nextMonth, #prevMonth {
+    font-size: 0.7rem;
+    font-weight: bolder;
+  }
+
+  table, tbody, thead, tr, td {
+    padding: 1px;
+  }
+
+  tr:nth-child(3) {
+    border-top: 10px #f5f3f4 solid;
+  }
+
+  li.task {
+    font-size: 0.5rem;
+    padding: 1px;
+    overflow-wrap: anywhere;
+  }
+
+  tr.days.pc {
+    display: none;
+  }
+  tr.days.phone {
+    display: table-row;
+
+    > td {
+      font-size: 0.8rem;
+      border: 2px solid #d3d3d3;
+    }
+  }
+
+  td div.task-wrapper ul.tasklist {
+    padding: 1px;
+  }
+
+  .task-wrapper .tasklist-panel {
+    width: 300%;
+    right: -300%;
+
+    > p.title {
+      font-size: 0.5rem;
+      height: 12.5px;
+      width: 133%;
+      left: -33%;
+    }
+  }
+
+  ul.tasklist-expand li.task span.check {
+    width: 15px;
+    height: 15px;
+  }
+
+  li.phone {
+    font-size: 0.7rem;
+  }
+
+  li.secondary {
+    font-size: 0.5rem;
+  }
+
+  aside {
+    left: -100%;
+  }
+
+  div.wrapper {
+    margin-left: 0;
+  }
+
+  button.menu {
+    display: block;
+  }
+
+  aside {
+    width: 100%;
+  }
+
+  aside.open {
+    left: 0;
+  }
+
+  aside:not(.open):hover {
+    left: -100%;
+  }
+
+  aside.open:hover {
+    left: 0;
+  }
+
+  button#closeMobileMenu {
+    display: block;
+  }
 }

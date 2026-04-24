@@ -15,7 +15,7 @@ document.getElementById("manual-panel").style.display = "flex";
 
 panel.style.display = "none";
 
-function openTab(evt, tabName) {
+function openTab(_, tabName) {
   var d = document.getElementById(tabName);
   document.getElementById(active.id + "-panel").style.display = "none";
   document.getElementById(tabName + "-panel").style.display = "flex";

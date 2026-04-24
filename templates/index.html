@@ -92,15 +92,17 @@
       </div>
     </div>
     <div class="container">
-      <aside>
+      <aside id="aside">
         <div class="buttons">
+          <div class="inline"><span></span>
+          <button id="closeMobileMenu"><img src="{{url_for('static', filename='images/plus.png')}}" alt="close aside menu" width="30px" height="30px"></button></div>
           <div class="inline"><a class="anim-title" href="/profile">{{user.name}}</a>
             <img src="{{url_for('static', filename='images/blank-avatar.png')}}" width="30px" height="30px"></div>
           <br>
           <a href="#" id="addTask"><div class="inline">
             <p>Добавить задание</p><img src="{{url_for('static', filename='images/plus.png')}}" width="30px" height="30px"></div>
           </a>
-          <a href="#"><div class="inline"><p>Классы и дети</p>
+          <a href="/classes"><div class="inline"><p>Классы и дети</p>
           <img id="children" src="{{url_for('static', filename='images/class.png')}}" alt="" width="30px" height="30px"></div></a> 
           <a href="#" id="logout"><div class="inline"><p>Выйти</p>
           <img src="{{url_for('static', filename='images/exit.png')}}" width="30px" height="30px">
@@ -111,7 +113,8 @@
         </div>
       </aside>
       <div class="wrapper">
-      <nav><span style="font-size: 1.3rem;margin-top:4px;">{{user.name}}</span><span>ТВОЙ РИТМ</span></nav>
+      <nav><button id="mobileMenu" class="menu"><img src="{{url_for('static', filename='images/options.png')}}" width="30px" height="30px" alt="open side menu"></button>
+        <span style="font-size: 1.3rem;margin-top:4px;">{{user.name}}</span><a href="/" class="blank">ТВОЙ РИТМ</a></nav>
       <main>
         <div class="tableHeader">
         <button id="prevMonth">&lt;</button>

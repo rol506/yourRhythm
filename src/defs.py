@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, DateField, PasswordField, RadioField, StringField, SubmitField, TextAreaField, TimeField
+from wtforms import BooleanField, DateField, HiddenField, PasswordField, RadioField, StringField, SubmitField, TextAreaField, TimeField, validators
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
 class User:
@@ -43,3 +43,18 @@ class AddTaskAIForm(FlaskForm):
     task = TextAreaField("Опишите задание:", render_kw={"placeholder": "Например: В среду нужно вынести мусор."}, validators=[DataRequired()])
     priority = RadioField("Приоритет:", choices=[('0', 'Низкий'), ('1','Средний'), ('2','Высокий')])
     submit = SubmitField("Добавить задания")
+
+class AddTaskForChild(FlaskForm):
+    task = TextAreaField("Опишите задание:", validators=[DataRequired()])
+    priority = RadioField("Приоритет:", choices=[('0', 'Низкий'), ('1','Средний'), ('2','Высокий')])
+    deadlineDate = DateField("Укажите дедлайн:", validators=[DataRequired()])
+    deadlineTime = TimeField("", validators=[DataRequired()])
+    id = HiddenField("userID", render_kw={"id": "hidden"}, validators=[DataRequired()])
+    submit = SubmitField("Добавить задание")
+
+class AddTaskForChildAI(FlaskForm):
+    task = TextAreaField("Опишите задание:", render_kw={"placeholder": "Например: В среду нужно вынести мусор."}, validators=[DataRequired()])
+    priority = RadioField("Приоритет:", choices=[('0', 'Низкий'), ('1','Средний'), ('2','Высокий')])
+    id = HiddenField("userID", render_kw={"id": "hiddenAI"}, validators=[DataRequired()])
+    submit = SubmitField("Добавить задания")
+

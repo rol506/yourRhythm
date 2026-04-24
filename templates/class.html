@@ -4,7 +4,6 @@
   <head>
     {% block head %}
       {{super()}}
-      <script src="{{url_for('static', filename='js/chart.js')}}"></script>
     {% endblock %}
   </head>
   <body>
@@ -20,8 +19,9 @@
         </div>
         <div class="tabContents">
           <div class="tabcontent" id="manual-panel">
-            <form action="/" method="post" class="addTask">
+            <form action="/addTaskChild" method="post" class="addTask">
               {{form.hidden_tag()}}
+              {{form.id()}}
               {{form.task.label()}}
               {{form.task()}}
               <div class="inline-grid">
@@ -59,32 +59,32 @@
             </form>
           </div>
           <div class="tabcontent" id="aiAssist-panel">
-            <form action="/addAI" method="post" class="addTask">
+            <form action="/addTaskChildAI" method="post" class="addTask">
               {{aiForm.hidden_tag()}}
               {{aiForm.task.label()}}<br>
               <p style="color: #959393;margin:0;padding-bottom: 10px;">(с указанием о дедлайне):</p>
               {{aiForm.task()}}
               {{aiForm.priority.label()}}
-                  <ul id="priority" style="list-style:none;padding: 5px;margin:2px;">
-                    <li>
-                      <label>
-                        <input type="radio" id="priority-0" name="priority" value="0">
-                        <span>Низкий</span>
-                      </label>
-                    </li>
-                    <li>
-                      <label>
-                        <input type="radio" id="priority-1" name="priority" value="1">
-                        <span>Средний</span>
-                      </label>
-                    </li>
-                    <li>
-                      <label>
-                        <input type="radio" id="priority-2" name="priority" value="2">
-                        <span>Высокий</span>
-                      </label>
-                    </li>
-                  </ul>
+                <ul id="priority" style="list-style:none;padding: 5px;margin:2px;">
+                  <li>
+                    <label>
+                      <input type="radio" id="priority-0" name="priority" value="0">
+                      <span>Низкий</span>
+                    </label>
+                  </li>
+                  <li>
+                    <label>
+                      <input type="radio" id="priority-1" name="priority" value="1">
+                      <span>Средний</span>
+                    </label>
+                  </li>
+                  <li>
+                    <label>
+                      <input type="radio" id="priority-2" name="priority" value="2">
+                      <span>Высокий</span>
+                    </label>
+                  </li>
+                </ul>
               <div class="button-wrapper">{{aiForm.submit()}}</div>
             </form>
           </div>
@@ -94,74 +94,79 @@
     </div>
     <div class="container">
       <aside id="aside">
-        <div class="inline"><span></span>
-        <button id="closeMobileMenu"><img src="{{url_for('static', filename='images/plus.png')}}" alt="close aside menu" width="30px" height="30px"></button></div>
         <div class="buttons">
+          <div class="inline"><span></span>
+          <button id="closeMobileMenu"><img src="{{url_for('static', filename='images/plus.png')}}" alt="close aside menu" width="30px" height="30px"></button></div>
           <div class="inline"><a class="anim-title" href="/profile">{{user.name}}</a>
-            <img src="{{url_for('static', filename='images/blank-avatar.png')}}" width="30px" height="30px"></div> 
+            <img src="{{url_for('static', filename='images/blank-avatar.png')}}" width="30px" height="30px"></div>
           <br>
           <a href="#" id="addTask"><div class="inline">
             <p>Добавить задание</p><img src="{{url_for('static', filename='images/plus.png')}}" width="30px" height="30px"></div>
           </a>
-          <a href="/classes"><div class="inline"><p>Классы и дети</p>
-          <img id="children" src="{{url_for('static', filename='images/class.png')}}" alt="" width="30px" height="30px"></div></a> 
           <a href="/"><div class="inline"><p>Мой календарь</p>
           <img src="{{url_for('static', filename='images/arrow.png')}}" alt="" width="31px" height="30px"></div></a> 
           <a href="#" id="logout"><div class="inline"><p>Выйти</p>
           <img src="{{url_for('static', filename='images/exit.png')}}" width="30px" height="30px">
           </div></a>
-          <a href="#" id="loader" style="pointer-events: none"><div class="inline"><p>Загружаем задания ...</p>
+          <a href="#" id="loader" style="pointer-events: none"><div class="inline"><p>Загружаем календарь...</p>
             <div class="spin" style="width: 20px; height: 20px"></div></div>
           </a>
         </div>
       </aside>
-      <div class="wrapper"> 
+      <div class="wrapper">
       <nav><button id="mobileMenu" class="menu"><img src="{{url_for('static', filename='images/options.png')}}" width="30px" height="30px" alt="open side menu"></button>
         <span style="font-size: 1.3rem;margin-top:4px;">{{user.name}}</span><a href="/" class="blank">ТВОЙ РИТМ</a></nav>
       <main>
-        <div class="tableHeader">Ваш профиль</div>
-        <div class="grid">
-          <div class="stats" style="grid-area: stats">
-            <p class="chartTitle" style="text-align: center;">
-            {% if all > 0 %}
-              {% if all == completed %}
-              Все готово! Вы отлично справились сегодня
-              {% else %}
-                {% if percent >= 66 %}
-                Почти у цели! Осталось совсем немного
-                {% else %}
-                  {% if percent >= 49 %}
-                  Полпути уже позади!
-                  {% else %}
-                    {% if percent >= 23 %}
-                    Вы двигаетесь в правильном направлении!
-                    {% else %}
-                    На сегодня есть задачи. Приступайте скорее!
-                    {% endif %}
-                  {% endif %}
-                  {% endif %}
-              {% endif %} 
-            {% endif %}
-            </p>
-            <canvas id="completion">Ваш браузер не поддерживает элемент canvas</canvas>
-            <p id="chartText" class="chartText"></p>
-          </div>
-          <div id="tasks" class="tasks" style="grid-area: tasks"> 
-          <div class="block"><span>Задачи на сегодня:</span></div>
-          </div>
-          <div class="graph" style="grid-area: graph">
-            <canvas id="graph" height="200px">Ваш браузер не поддерживает элемент canvas</canvas>
-          </div>
+        {% if classes %}
+        <div class="tableHeader">Классы</div>
+        <div class="accordion">
+          {% for name, children in classes.items() %}
+            <button class="accordion">{{name}}</button>
+            <div class="acc-panel">
+              <div class="acc-wrapper">
+              {% if children %}
+              <div class="addClass"><button class="addClass" onclick="addTaskChild(-{{children[0].classID}})"><img src="{{url_for('static', filename='images/plus-dark.png')}}" width="15px" height="15px">
+              <span>Выдать задание классу</span></button></div>
+              <table>
+                {% for c in children %}
+                  <tr class="child child-{{c.id}}">
+                    <td class="btn"><button class="addTaskChild" onclick="addTaskChild({{c.id}})" title="Задать личное задание">
+                    <img src="{{url_for('static', filename='images/plus.png')}}" width="15px" height="15px"></button></td>
+                    <td><span>{{c.name}}</span></td><td><span>Выполнено на этой неделе: {{c.completed}}/{{c.all}} ({{c.percent}}%)</span></td>
+                  </tr>
+              {% endfor %}
+              {% endif %}
+              </table>
+              </div>
+            </div>
+          {% endfor %}
         </div>
+        {% endif %}
+        {% if children %}
+        <div class="tableHeader">Дети</div>
+        {% endif %}
       </main>
       </div>
     </div>
-    <script src="{{url_for('static', filename='js/addTask.js')}}"></script>
+    <script src="{{url_for('static', filename='js/addTask.js')}}" defer></script>
     <script>
-let completed = {{completed}};
-let all = {{all}}
+    const hidden = document.getElementById("hidden");
+    const hiddenAI = document.getElementById("hiddenAI");
+    const loader = document.getElementById("loader");
+    const def = "{{user.id}}";
+    function addTaskChild(id) {
+      if (id === undefined) {
+        hidden.value = def;
+      }
+      hidden.value = id;
+      panel.style.display = "flex";
+      openTab("", "manual");
+    }
+    loader.style.display = "none";
+
     </script>
-    <script src="{{url_for('static', filename='js/profile.js')}}"></script>
+
+    <script src="{{url_for('static', filename='js/accordion.js')}}"></script>
     {% endblock %}
   </body>
 </html>
