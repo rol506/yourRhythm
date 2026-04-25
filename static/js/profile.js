@@ -66,7 +66,11 @@ for (var t of tasks) {
 html += "</ul>";
 tasklist.innerHTML = "<div class='block'><span>Задачи на сегодня:</span></div>" + html;
 
-chartText.innerHTML = Math.round(completed / all * 100) + "%";
+if (all == 0) {
+  chartText.innerHTML = "0%";
+} else {
+  chartText.innerHTML = Math.round(completed / all * 100) + "%";
+}
 chart = new Chart(ctx, {
   type: 'doughnut',
   data: data,
@@ -171,7 +175,11 @@ function updateCharts() {
   html += "</ul>";
   tasklist.innerHTML = "<div class='block'><span>Задачи на сегодня:</span></div>" + html;
 
-  chartText.innerHTML = Math.round(completed / all * 100) + "%";
+  if (all == 0) {
+    chartText.innerHTML = "0%";
+  } else {
+    chartText.innerHTML = Math.round(completed / all * 100) + "%";
+  }
 
   chart.data = data;
   chart.update();
