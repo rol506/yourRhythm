@@ -120,7 +120,7 @@ def download():
         f.writelines(c.serialize_iter())
         f.close()
         f = open("cal.ics", "rb")
-    return send_file(f, download_name="Your-Rhythm-Imported.ics", as_attachment=True)
+    return send_file(f, download_name="Your-Rhythm-Exported.ics", as_attachment=True)
 
 @app.route("/calendar/<id>")
 @login_required
@@ -508,14 +508,31 @@ def notifyAI():
         if request.method == "POST":
             return abort(401)
     
-    # TODO make notifications with AI
+    if int(app.config["DISABLE_AI"]) > 0:
+        return redirect("/classes")
 
     form = SendNotification()
-    if form.validate_on_submit():
+    if form.validate_on_submit(): 
         if int(form.id.data) < 0:
             classID = int(form.id.data) * -1
+            res = dbase.getRemainingHometasksClass(classID)
+            for email, tasks in res.items():
+                logging.debug("Sending mail to " + email)
+                if email.split('@')[1] == 'example.com':
+                    continue
+                query = '. '.join(tasks)
+                res = requests.get("http://" + app.config["AI_HOST"] + ":" + str(app.config["AI_PORT"]) + "/processNotification/" + quote(query.strip())).content
+                emailer.sendHometaskReminder(tasks, [email], json.loads(unquote(res))["text"])
         else:
             userID = form.id.data
+            tasks = dbase.getRemainingHometasks(userID)
+            user = dbase.getUserByID(userID)
+            logging.debug("Sending mail to " + user["email"])
+            if user["email"].split('@')[1] == 'example.com':
+                return redirect("/classes")
+            query = '. '.join(tasks)
+            res = requests.get("http://" + app.config["AI_HOST"] + ":" + str(app.config["AI_PORT"]) + "/processNotification/" + quote(query.strip())).content
+            emailer.sendHometaskReminder(tasks, [user["email"]], json.loads(unquote(res))["text"])
 
     return redirect("/classes")
 

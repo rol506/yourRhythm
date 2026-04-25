@@ -5,7 +5,7 @@ import json
 import locale
 
 locale.setlocale(locale.LC_ALL, "ru_RU.utf-8")
-llm = Llama.from_pretrained(repo_id="bartowski/Meta-Llama-3.1-8B-Instruct-GGUF", filename="Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf", n_ctx=0)
+llm = Llama.from_pretrained(repo_id="bartowski/Meta-Llama-3.1-8B-Instruct-GGUF", filename="Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf")
 
 def processTask(query):
     systemPrompt = """Ты - умный помощник-трекер учебных задач. Твоя зажача - проанализировать присланный пользователем текст и извлечь из него все ключевые задания.
@@ -15,7 +15,6 @@ def processTask(query):
     4) Для каждой задачи отдельно составь объект JSON по такому формату {"date": "дата дедлайна в формате ДД/ММ/ГГГГ", "time": "время дедлайна", "task": "текстовое описание задания", "priority": "приоритет"}.
     Объекты разделяй между собой только запятыми.
     Текущая дата: """ + datetime.datetime.now().strftime("%A %d/%m/%Y")
-    userPrompt = """В среду нужно вынести мусор и выгулять собаку. В пятницу нужно подготовиться к дню рождения Саши"""
 
     prompt = f"""<|begin_of_text|><|start_header_id|><|end_header_id|>
 
@@ -24,7 +23,7 @@ def processTask(query):
 
     {systemPrompt}<|eot_id|><|start_header_id|>user<|end_header_id|>
 
-    {userPrompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
+    {query}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
 
     options = llm(prompt, max_tokens=0)
     print("\nRES:",options["choices"][0]["text"],"\n")
@@ -61,5 +60,15 @@ def processNotification(query):
     found = re.findall(r"((\[[^\}]{3,})?\{s*[^\}\{]{3,}?:.*\}([^\{]+\])?)", options["choices"][0]["text"].replace("\n", "").replace("}{", "},{"))
     print("FOUND:",found)
 
-if __name__ == "__main__":
-    processNotification("Физика: выполнить номер 12")
+    res = []
+    for j in found:
+        try:
+            if len(j[0]) < 1:
+                continue
+            js = json.loads("[" + j[0] + "]")
+            res += js
+        except json.JSONDecodeError as e:
+            print("error:", e)
+
+    print("decoded " + str(len(res)))
+    print("RESULT: ",res)

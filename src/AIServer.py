@@ -58,6 +58,35 @@ def processRequest(query):
     print("RESULT: ",res)
     return jsonify(res)
 
+@app.route("/processNotification/<query>")
+def processNotification(query):
+    systemPrompt = """Ты - умный помощник-трекер учебных задач. Твоя задача - по текстовому описанию заданий составить текст персонального уведомления для напоминания человеку о том, что эти задания необходимо выполнить. Составь JSON-объект в соответствии со следующим форматом {"text": "текст уведомления для напоминания"}."""
+
+    prompt = f"""<|begin_of_text|><|start_header_id|><|end_header_id|>
+
+    Cutting Knowledge Date: December 2023
+    Today Date: {datetime.datetime.now().strftime("%d %b %Y")}
+
+    {systemPrompt}<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+    {query}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
+
+    options = llm(prompt, max_tokens=0)
+    found = re.findall(r"((\[[^\}]{3,})?\{s*[^\}\{]{3,}?:.*\}([^\{]+\])?)", options["choices"][0]["text"].replace("\n", "").replace("}{", "},{"))
+
+    res = []
+    for j in found:
+        try:
+            if len(j[0]) < 1:
+                continue
+            js = json.loads("[" + j[0] + "]")
+            res += js
+        except json.JSONDecodeError as e:
+            print("error:", e)
+
+    print("RESULT: ",res)
+    return jsonify(res[0])
+
 @app.route("/healthcheck")
 @app.route("/")
 def healthcheck():
